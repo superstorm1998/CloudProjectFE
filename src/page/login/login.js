@@ -6,13 +6,16 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Grid from "@material-ui/core/Grid";
 import Link from "@material-ui/core/Link";
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles, makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import LockIcon from "@material-ui/icons/Lock";
 import React from "react";
 import Logo from "../../asset/logoCloud.png";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
+import { Backdrop, CircularProgress } from "@material-ui/core";
 
 const useStyles = theme => ({
   root: {
@@ -53,6 +56,22 @@ const useStyles = theme => ({
   }
 });
 
+const backdropStyle = makeStyles(theme => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff"
+  }
+}));
+
+function SimpleBackdrop(open) {
+  const classes = backdropStyle();
+  return (
+    <Backdrop className={classes.backdrop} open={open.open}>
+      <CircularProgress color="inherit" />
+    </Backdrop>
+  );
+}
+
 class LoginPage extends React.Component {
   constructor(props) {
     super(props);
@@ -61,32 +80,63 @@ class LoginPage extends React.Component {
       password: "",
       error: false,
       message: "",
-      data: null
+      data: null,
+      isOpen: false
     };
   }
 
   handleLogin = (username, password) => {
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     let url = `https://stockymanager.azurewebsites.net/api/UserAccount?email=${username}&phone=${password}`;
+    toastr.options = {
+      closeButton: false,
+      debug: false,
+      newestOnTop: false,
+      progressBar: false,
+      positionClass: "toast-top-right",
+      preventDuplicates: false,
+      onclick: null,
+      showDuration: "300",
+      hideDuration: "1000",
+      timeOut: "3000",
+      extendedTimeOut: "1000",
+      showEasing: "swing",
+      hideEasing: "linear",
+      showMethod: "fadeIn",
+      hideMethod: "fadeOut"
+    };
+    this.setState({ isOpen: true });
     fetch(proxyurl + url)
       .then(response => response.json())
       .then(data => {
         if (data.length > 0) {
-          this.setState({ message: "" });
+          this.setState({ message: "", isOpen: false });
           this.props.history.push({ pathname: "/Home", state: { user: data } });
         } else {
-          this.setState({ message: "Your username or password is incorrect." });
+          this.setState({
+            message: "Your username or password is incorrect.",
+            isOpen: false
+          });
         }
       })
-      .catch(() => console.log("error"));
+      .catch(() => {
+        this.setState({
+          isOpen: false
+        });
+        toastr.error(
+          "There are some error had been happen. Please try in another time.",
+          "Fail"
+        );
+      });
   };
 
   render() {
     const { classes } = this.props;
-    const { username, password, error, message } = this.state;
+    const { username, password, error, message, isOpen } = this.state;
 
     return (
       <Grid container justify="center" className={classes.root}>
+        <SimpleBackdrop open={isOpen} />
         <Container container="main" maxWidth="xs" className={classes.container}>
           <CssBaseline />
           <Grid className={classes.paper}>

@@ -22,6 +22,8 @@ import {
 import AddCircleOutlineOutlinedIcon from "@material-ui/icons/AddCircleOutlineOutlined";
 import moment from "moment";
 import toastr from "toastr";
+import "toastr/build/toastr.min.css";
+
 const StyledTableCell = withStyles(theme => ({
   head: {
     backgroundColor: "#3f51b5",
@@ -380,4 +382,20 @@ export default class Transaction extends React.Component {
                     {row.openTime && moment(row.openTime).format("YYYY-MM-DD")}
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {row.closeTime &&
+                    {row.closeTime &&
+                      moment(row.closeTime).format("YYYY-MM-DD")}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    {row.preMoney}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    {row.postMoney}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  }
+}

@@ -24,6 +24,7 @@ import {
 } from "@material-ui/core";
 import AddCircleOutlineOutlinedIcon from "@material-ui/icons/AddCircleOutlineOutlined";
 import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 const StyledTableCell = withStyles(theme => ({
   head: {
@@ -419,4 +420,18 @@ export default class Transaction extends React.Component {
                     {row.id}
                   </StyledTableCell>
                   <StyledTableCell align="center">
-               
+                    {row.totalShares}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">{row.status}</StyledTableCell>
+                  <StyledTableCell align="center">{row.userId}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    {row.shareholderTypeId}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  }
+}
