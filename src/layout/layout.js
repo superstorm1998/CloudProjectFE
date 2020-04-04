@@ -27,85 +27,85 @@ import { useHistory } from "react-router-dom";
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex"
+    display: "flex",
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   },
   appBarShift: {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   menuButton: {
-    marginRight: 36
+    marginRight: 36,
   },
   hide: {
-    display: "none"
+    display: "none",
   },
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: "nowrap"
+    whiteSpace: "nowrap",
   },
   drawerOpen: {
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   drawerClose: {
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
+      duration: theme.transitions.duration.leavingScreen,
     }),
     overflowX: "hidden",
     width: theme.spacing(7) + 1,
     [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9) + 1
-    }
+      width: theme.spacing(9) + 1,
+    },
   },
   toolbar: {
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-end",
     padding: theme.spacing(0, 1),
-    ...theme.mixins.toolbar
+    ...theme.mixins.toolbar,
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3)
+    padding: theme.spacing(3),
   },
   table: {
-    marginTop: theme.spacing(15)
-  }
+    marginTop: theme.spacing(15),
+  },
 }));
 
 const StyledMenu = withStyles({
   paper: {
-    border: "1px solid #d3d4d5"
-  }
-})(props => (
+    border: "1px solid #d3d4d5",
+  },
+})((props) => (
   <Menu
     elevation={0}
     getContentAnchorEl={null}
     anchorOrigin={{
       vertical: "bottom",
-      horizontal: "center"
+      horizontal: "center",
     }}
     transformOrigin={{
       vertical: "top",
-      horizontal: "center"
+      horizontal: "center",
     }}
     {...props}
   />
@@ -115,7 +115,7 @@ function CustomizedMenus() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   let history = useHistory();
 
-  const handleClick = event => {
+  const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -176,7 +176,7 @@ export default function MiniDrawer() {
         <AppBar
           position="fixed"
           className={clsx(classes.appBar, {
-            [classes.appBarShift]: open
+            [classes.appBarShift]: open,
           })}
         >
           <Toolbar>
@@ -189,7 +189,7 @@ export default function MiniDrawer() {
                     onClick={handleDrawerOpen}
                     edge="start"
                     className={clsx(classes.menuButton, {
-                      [classes.hide]: open
+                      [classes.hide]: open,
                     })}
                   >
                     <MenuIcon />
@@ -213,13 +213,13 @@ export default function MiniDrawer() {
           variant="permanent"
           className={clsx(classes.drawer, {
             [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open
+            [classes.drawerClose]: !open,
           })}
           classes={{
             paper: clsx({
               [classes.drawerOpen]: open,
-              [classes.drawerClose]: !open
-            })
+              [classes.drawerClose]: !open,
+            }),
           }}
         >
           <div className={classes.toolbar}>
@@ -236,7 +236,7 @@ export default function MiniDrawer() {
             <ListItem
               button
               selected={selectedIndex === 0}
-              onClick={event => handleListItemClick(event, 0)}
+              onClick={(event) => handleListItemClick(event, 0)}
             >
               <ListItemIcon>
                 <ListIcon />
@@ -246,7 +246,7 @@ export default function MiniDrawer() {
             <ListItem
               button
               selected={selectedIndex === 1}
-              onClick={event => handleListItemClick(event, 1)}
+              onClick={(event) => handleListItemClick(event, 1)}
             >
               <ListItemIcon>
                 <ShareIcon />
@@ -256,7 +256,7 @@ export default function MiniDrawer() {
             <ListItem
               button
               selected={selectedIndex === 2}
-              onClick={event => handleListItemClick(event, 2)}
+              onClick={(event) => handleListItemClick(event, 2)}
             >
               <ListItemIcon>
                 <SubtitlesIcon />
@@ -277,17 +277,17 @@ export default function MiniDrawer() {
       >
         {selectedIndex === 0 && (
           <Grid item xs={9}>
-            <Series />
+            <Series companyId="CPN001" />
           </Grid>
         )}
         {selectedIndex === 1 && (
           <Grid item xs={9}>
-            <Shared />
+            <Shared companyId="CPN001" />
           </Grid>
         )}
         {selectedIndex === 2 && (
           <Grid item xs={9}>
-            <Transaction />
+            <Transaction companyId="CPN001" />
           </Grid>
         )}
       </Grid>

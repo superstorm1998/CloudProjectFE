@@ -20,33 +20,35 @@ import {
   DialogActions,
   FormControl,
   Select,
-  MenuItem
+  MenuItem,
+  InputAdornment,
 } from "@material-ui/core";
 import AddCircleOutlineOutlinedIcon from "@material-ui/icons/AddCircleOutlineOutlined";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
+import SearchIcon from "@material-ui/icons/Search";
 
-const StyledTableCell = withStyles(theme => ({
+const StyledTableCell = withStyles((theme) => ({
   head: {
     backgroundColor: "#3f51b5",
-    color: theme.palette.common.white
+    color: theme.palette.common.white,
   },
   body: {
-    fontSize: 14
-  }
+    fontSize: 14,
+  },
 }))(TableCell);
 
-const StyledTableRow = withStyles(theme => ({
+const StyledTableRow = withStyles((theme) => ({
   root: {
-    "&:nth-of-type(odd)": {}
-  }
+    "&:nth-of-type(odd)": {},
+  },
 }))(TableRow);
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: "#fff"
-  }
+    color: "#fff",
+  },
 }));
 
 function SimpleBackdrop(open) {
@@ -72,7 +74,9 @@ export default class Transaction extends React.Component {
       Id: "",
       totalShare: "",
       UserId: "",
-      msg: ""
+      msg: "",
+      dataSearch: null,
+      searchValue: "",
     };
   }
 
@@ -82,15 +86,39 @@ export default class Transaction extends React.Component {
   }
 
   getData = async () => {
+    const { companyId } = this.props;
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url =
-      "https://stockymanager.azurewebsites.net/api/Shareholder?companyID=CPN001";
+    let url = `https://stockymanager.azurewebsites.net/api/Shareholder?companyID=${companyId}`;
     this.setState({ isOpen: true });
-
+    toastr.options = {
+      closeButton: false,
+      debug: false,
+      newestOnTop: false,
+      progressBar: false,
+      positionClass: "toast-top-right",
+      preventDuplicates: false,
+      onclick: null,
+      showDuration: "300",
+      hideDuration: "1000",
+      timeOut: "3000",
+      extendedTimeOut: "1000",
+      showEasing: "swing",
+      hideEasing: "linear",
+      showMethod: "fadeIn",
+      hideMethod: "fadeOut",
+    };
     await fetch(proxyurl + url)
-      .then(response => response.json())
-      .then(data => this.setState({ data: data, isOpen: false }))
-      .catch(() => this.setState({ isOpen: false }));
+      .then((response) => response.json())
+      .then((data) => this.setState({ data: data, isOpen: false }))
+      .catch(() => {
+        this.setState({
+          isOpen: false,
+        });
+        toastr.error(
+          "There are some error had been happen. Please try in another time.",
+          "Fail"
+        );
+      });
   };
 
   getShareType = async () => {
@@ -99,8 +127,8 @@ export default class Transaction extends React.Component {
     this.setState({ isOpen: true });
 
     await fetch(proxyurl + url)
-      .then(response => response.json())
-      .then(data => this.setState({ shareHolderType: data, isOpen: false }))
+      .then((response) => response.json())
+      .then((data) => this.setState({ shareHolderType: data, isOpen: false }))
       .catch(() => this.setState({ isOpen: false }));
   };
 
@@ -112,15 +140,15 @@ export default class Transaction extends React.Component {
     this.setState({ open: false });
   };
 
-  handleChange = event => {
+  handleChange = (event) => {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  handleChangeStatus = event => {
+  handleChangeStatus = (event) => {
     this.setState({ status: event.target.value });
   };
 
-  handleChangeType = event => {
+  handleChangeType = (event) => {
     this.setState({ type: event.target.value });
   };
 
@@ -128,7 +156,7 @@ export default class Transaction extends React.Component {
     const { Id, totalShare, UserId, status, type } = this.state;
     if (totalShare < 0) {
       this.setState({
-        msg: "Please input total share > 0 "
+        msg: "Please input total share > 0 ",
       });
     } else {
       const data = {
@@ -137,7 +165,7 @@ export default class Transaction extends React.Component {
         status: status,
         userId: UserId,
         shareholderTypeId: type,
-        companyId: "CPN001"
+        companyId: "CPN001",
       };
       const proxyurl = "https://cors-anywhere.herokuapp.com/";
       let url = "https://stockymanager.azurewebsites.net/api/Shareholder";
@@ -157,17 +185,17 @@ export default class Transaction extends React.Component {
         showEasing: "swing",
         hideEasing: "linear",
         showMethod: "fadeIn",
-        hideMethod: "fadeOut"
+        hideMethod: "fadeOut",
       };
       fetch(proxyurl + url, {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
           Accept: "application/json",
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       })
-        .then(response => {
+        .then((response) => {
           if (response.status === 200) {
             this.getData();
             toastr.success("Create new series success", "Success");
@@ -188,6 +216,16 @@ export default class Transaction extends React.Component {
   handleCloseSnackbar = () => {
     this.setState({ openToast: false });
   };
+
+  handleSearch = (event) => {
+    const { data } = this.state;
+    const value = event.target.value;
+    this.setState({
+      searchValue: value,
+      dataSearch: data && data.filter((item) => (item = value)),
+    });
+  };
+
   render() {
     const {
       data,
@@ -199,10 +237,12 @@ export default class Transaction extends React.Component {
       msg,
       Id,
       totalShare,
-      UserId
+      UserId,
+      dataSearch,
+      searchValue,
     } = this.state;
     const gridItem = {
-      padding: "0.5rem"
+      padding: "0.5rem",
     };
     return (
       <TableContainer component={Paper} style={{ maxHeight: "30rem" }}>
@@ -213,10 +253,27 @@ export default class Transaction extends React.Component {
           alignItems="center"
           style={{ padding: "0.5rem", border: "1px solid blue" }}
         >
-          <Grid item xs={10} style={{ textAlign: "center" }}>
-            <Typography variant="h5" color="primary">
-              ShareHolder
-            </Typography>
+          <Grid container item xs={10} alignItems="center">
+            <Grid item xs={4} style={{ padding: "0 2rem" }}>
+              <Typography variant="h5" color="primary">
+                ShareHolder
+              </Typography>
+            </Grid>
+            <Grid item xs={8} container justify="flex-end">
+              <TextField
+                label="Search"
+                variant="outlined"
+                margin="dense"
+                onChange={this.handleSearch}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
           </Grid>
           <Grid container justify="flex-end" item xs={2}>
             <Button
@@ -413,7 +470,8 @@ export default class Transaction extends React.Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data &&
+            {searchValue === "" ? (
+              data &&
               data.map((row, index) => (
                 <StyledTableRow key={index}>
                   <StyledTableCell component="th" scope="row">
@@ -428,7 +486,30 @@ export default class Transaction extends React.Component {
                     {row.shareholderTypeId}
                   </StyledTableCell>
                 </StyledTableRow>
-              ))}
+              ))
+            ) : dataSearch && dataSearch ? (
+              dataSearch.map((row, index) => (
+                <StyledTableRow key={index}>
+                  <StyledTableCell component="th" scope="row">
+                    {row.id}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    {row.totalShares}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">{row.status}</StyledTableCell>
+                  <StyledTableCell align="center">{row.userId}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    {row.shareholderTypeId}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))
+            ) : (
+              <StyledTableRow>
+                <StyledTableCell align="left">
+                  No record is matched.
+                </StyledTableCell>
+              </StyledTableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
