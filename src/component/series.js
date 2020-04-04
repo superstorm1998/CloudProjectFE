@@ -175,9 +175,11 @@ export default class Transaction extends React.Component {
       })
         .then((response) => {
           if (response.status === 200) {
+            this.setState({ isOpen: false });
             this.getData();
             toastr.success("Create new series success", "Success");
           } else {
+            this.setState({ isOpen: false });
             toastr.error("Create new series fail", "Fail");
           }
         })

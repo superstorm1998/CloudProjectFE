@@ -197,6 +197,7 @@ export default class Transaction extends React.Component {
       })
         .then((response) => {
           if (response.status === 200) {
+            this.setState({ isOpen: false });
             this.getData();
             toastr.success("Create new series success", "Success");
           } else {
@@ -374,7 +375,7 @@ export default class Transaction extends React.Component {
                     style={gridItem}
                   >
                     <Grid item xs={3}>
-                      User Id:
+                      Holder:
                     </Grid>
                     <Grid item xs={6}>
                       <TextField
@@ -422,7 +423,7 @@ export default class Transaction extends React.Component {
                   </Grid>
                 </Grid>
               </DialogContent>
-              {Id === "" || totalShare !== "" || UserId !== "" ? (
+              {Id === "" || totalShare === "" || UserId === "" ? (
                 <Grid container justify="center" style={{ color: "red" }}>
                   Please input all in the form.
                 </Grid>
@@ -463,7 +464,7 @@ export default class Transaction extends React.Component {
               <StyledTableCell>Id</StyledTableCell>
               <StyledTableCell align="center">Total Shares</StyledTableCell>
               <StyledTableCell align="center">Status</StyledTableCell>
-              <StyledTableCell align="center">User Id</StyledTableCell>
+              <StyledTableCell align="center">Holder</StyledTableCell>
               <StyledTableCell align="center">
                 Shareholder TypeId
               </StyledTableCell>
