@@ -25,6 +25,9 @@ import moment from "moment";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import SearchIcon from "@material-ui/icons/Search";
+import { apiURL } from "../constant/constant";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -67,8 +70,8 @@ export default class Transaction extends React.Component {
       open: false,
       isOpen: false,
       seriesId: "",
-      openTime: "",
-      closeTime: "",
+      openTime: new Date(),
+      closeTime: new Date(),
       preMoney: "",
       postMoney: "",
       msg: "",
@@ -83,8 +86,8 @@ export default class Transaction extends React.Component {
 
   getData = () => {
     const { companyId } = this.props;
-    const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = `https://stockymanager.azurewebsites.net/api/Series?companyID=${companyId}`;
+    const proxyurl = apiURL.proxyUrl;
+    let url = `${apiURL.baseUrl}/Series?companyID=${companyId}`;
     this.setState({ isOpen: true });
     toastr.options = {
       closeButton: false,
@@ -129,7 +132,16 @@ export default class Transaction extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
+  setStartDate = (date) => {
+    this.setState({ openTime: date });
+  };
+
+  setEndDate = (date) => {
+    this.setState({ closeTime: date });
+  };
+
   handleSave = () => {
+    const { companyId } = this.props;
     const { seriesId, openTime, closeTime, preMoney, postMoney } = this.state;
     if (preMoney < 0 || postMoney < 0 || preMoney >= postMoney) {
       this.setState({
@@ -143,10 +155,10 @@ export default class Transaction extends React.Component {
         closeTime: closeTime,
         preMoney: preMoney,
         postMoney: postMoney,
+        companyId: companyId,
       };
-      const { companyId } = this.props;
-      const proxyurl = "https://cors-anywhere.herokuapp.com/";
-      let url = `https://stockymanager.azurewebsites.net/api/Series?companyID=${companyId}`;
+      const proxyurl = apiURL.proxyUrl;
+      let url = `${apiURL.baseUrl}/Series`;
       this.setState({ isOpen: true });
       toastr.options = {
         closeButton: false,
@@ -199,7 +211,11 @@ export default class Transaction extends React.Component {
     const value = event.target.value;
     this.setState({
       searchValue: value,
-      dataSearch: data && data.filter((item) => (item = value)),
+      dataSearch:
+        data &&
+        data.filter(function (item) {
+          return item.id.toLowerCase().includes(value.toLowerCase());
+        }),
     });
   };
 
@@ -300,12 +316,12 @@ export default class Transaction extends React.Component {
                       Open Time:
                     </Grid>
                     <Grid item xs={6}>
-                      <TextField
-                        variant="outlined"
-                        label="Open Time"
-                        size="small"
-                        onChange={this.handleChange}
-                        name="openTime"
+                      <DatePicker
+                        selected={this.state.openTime}
+                        onChange={(date) => this.setStartDate(date)}
+                        selectsStart
+                        startDate={this.state.openTime}
+                        endDate={this.state.closeTime}
                       />
                     </Grid>
                   </Grid>
@@ -321,12 +337,13 @@ export default class Transaction extends React.Component {
                       Close Time:
                     </Grid>
                     <Grid item xs={6}>
-                      <TextField
-                        variant="outlined"
-                        label="Close Time"
-                        size="small"
-                        onChange={this.handleChange}
-                        name="closeTime"
+                      <DatePicker
+                        selected={this.state.closeTime}
+                        onChange={(date) => this.setEndDate(date)}
+                        selectsEnd
+                        startDate={this.state.openTime}
+                        endDate={this.state.closeTime}
+                        minDate={this.state.openTime}
                       />
                     </Grid>
                   </Grid>
@@ -376,13 +393,9 @@ export default class Transaction extends React.Component {
                   </Grid>
                 </Grid>
               </DialogContent>
-              {seriesId === "" ||
-              openTime === "" ||
-              closeTime === "" ||
-              preMoney === "" ||
-              postMoney === "" ? (
+              {seriesId === "" || preMoney === "" ? (
                 <Grid container justify="center" style={{ color: "red" }}>
-                  Please input all in the form.
+                  Please input seriesId, preMoney to the form.
                 </Grid>
               ) : null}
               <Grid container justify="center" style={{ color: "red" }}>
@@ -452,7 +465,7 @@ export default class Transaction extends React.Component {
                   </StyledTableCell>
                 </StyledTableRow>
               ))
-            ) : dataSearch && dataSearch ? (
+            ) : dataSearch && dataSearch.length > 0 ? (
               dataSearch.map((row, index) => (
                 <StyledTableRow key={index}>
                   <StyledTableCell component="th" scope="row">

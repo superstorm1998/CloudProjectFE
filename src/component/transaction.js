@@ -18,6 +18,7 @@ import {
 import moment from "moment";
 import SearchIcon from "@material-ui/icons/Search";
 import toastr from "toastr";
+import { apiURL } from "../constant/constant";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -64,8 +65,8 @@ export default class Transaction extends React.Component {
   }
 
   componentDidMount() {
-    const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = "https://stockymanager.azurewebsites.net/api/Transaction";
+    const proxyurl = apiURL.proxyUrl;
+    let url = `${apiURL.baseUrl}/Transaction`;
     this.setState({ isOpen: true });
     toastr.options = {
       closeButton: false,
@@ -98,11 +99,15 @@ export default class Transaction extends React.Component {
       });
   }
   handleSearch = (event) => {
-    const { data } = this.state;
+    const { transactions } = this.state;
     const value = event.target.value;
     this.setState({
       searchValue: value,
-      dataSearch: data && data.filter((item) => (item = value)),
+      dataSearch:
+        transactions &&
+        transactions.filter(function (item) {
+          return item.id.toLowerCase().includes(value.toLowerCase());
+        }),
     });
   };
 
@@ -127,6 +132,7 @@ export default class Transaction extends React.Component {
               label="Search"
               variant="outlined"
               margin="dense"
+              onChange={this.handleSearch}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -178,7 +184,7 @@ export default class Transaction extends React.Component {
                   </StyledTableCell>
                 </StyledTableRow>
               ))
-            ) : dataSearch && dataSearch ? (
+            ) : dataSearch && dataSearch.length > 0 ? (
               dataSearch.map((row, index) => (
                 <StyledTableRow key={index}>
                   <StyledTableCell component="th" scope="row">

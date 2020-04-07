@@ -16,11 +16,12 @@ import Logo from "../../asset/logoCloud.png";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import { Backdrop, CircularProgress } from "@material-ui/core";
+import { apiURL } from "../../constant/constant";
 
-const useStyles = theme => ({
+const useStyles = (theme) => ({
   root: {
     backgroundImage: "-webkit-linear-gradient(left, #2fc96c, #13a1ee)",
-    height: "100vh"
+    height: "100vh",
   },
   container: {
     position: "absolute",
@@ -28,39 +29,39 @@ const useStyles = theme => ({
     padding: theme.spacing(5, 8, 5),
     backgroundColor: "#fffef5",
     marginTop: theme.spacing(9),
-    borderRadius: "2rem"
+    borderRadius: "2rem",
   },
   paper: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.primary.main
+    backgroundColor: theme.palette.primary.main,
   },
   form: {
     width: "100%",
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(2),
   },
   submit: {
     margin: theme.spacing(1, 8, 4),
-    padding: theme.spacing(1, 6, 1)
+    padding: theme.spacing(1, 6, 1),
   },
   remember: {
-    margin: theme.spacing(0, 3.5, 1)
+    margin: theme.spacing(0, 3.5, 1),
   },
   message: {
     marginTop: theme.spacing(3),
-    color: "red"
-  }
+    color: "red",
+  },
 });
 
-const backdropStyle = makeStyles(theme => ({
+const backdropStyle = makeStyles((theme) => ({
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: "#fff"
-  }
+    color: "#fff",
+  },
 }));
 
 function SimpleBackdrop(open) {
@@ -81,13 +82,13 @@ class LoginPage extends React.Component {
       error: false,
       message: "",
       data: null,
-      isOpen: false
+      isOpen: false,
     };
   }
 
   handleLogin = (username, password) => {
-    const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = `https://stockymanager.azurewebsites.net/api/UserAccount?email=${username}&phone=${password}`;
+    const proxyurl = apiURL.proxyUrl;
+    let url = `${apiURL.baseUrl}/UserAccount?email=${username}&phone=${password}`;
     toastr.options = {
       closeButton: false,
       debug: false,
@@ -103,25 +104,25 @@ class LoginPage extends React.Component {
       showEasing: "swing",
       hideEasing: "linear",
       showMethod: "fadeIn",
-      hideMethod: "fadeOut"
+      hideMethod: "fadeOut",
     };
     this.setState({ isOpen: true });
     fetch(proxyurl + url)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data.length > 0) {
           this.setState({ message: "", isOpen: false });
           this.props.history.push({ pathname: "/Home", state: { user: data } });
         } else {
           this.setState({
             message: "Your username or password is incorrect.",
-            isOpen: false
+            isOpen: false,
           });
         }
       })
       .catch(() => {
         this.setState({
-          isOpen: false
+          isOpen: false,
         });
         toastr.error(
           "There are some error had been happen. Please try in another time.",
@@ -158,7 +159,9 @@ class LoginPage extends React.Component {
                     value={username}
                     autoComplete="true"
                     error={error}
-                    onChange={e => this.setState({ username: e.target.value })}
+                    onChange={(e) =>
+                      this.setState({ username: e.target.value })
+                    }
                   />
                 </Grid>
                 <Grid item sm={1}>
@@ -174,7 +177,9 @@ class LoginPage extends React.Component {
                     value={password}
                     error={error}
                     autoComplete="true"
-                    onChange={e => this.setState({ password: e.target.value })}
+                    onChange={(e) =>
+                      this.setState({ password: e.target.value })
+                    }
                   />
                 </Grid>
               </Grid>

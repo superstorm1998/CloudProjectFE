@@ -27,6 +27,7 @@ import AddCircleOutlineOutlinedIcon from "@material-ui/icons/AddCircleOutlineOut
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import SearchIcon from "@material-ui/icons/Search";
+import { apiURL } from "../constant/constant";
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -87,8 +88,8 @@ export default class Transaction extends React.Component {
 
   getData = async () => {
     const { companyId } = this.props;
-    const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = `https://stockymanager.azurewebsites.net/api/Shareholder?companyID=${companyId}`;
+    const proxyurl = apiURL.proxyUrl;
+    let url = `${apiURL.baseUrl}/Shareholder?companyID=${companyId}`;
     this.setState({ isOpen: true });
     toastr.options = {
       closeButton: false,
@@ -122,8 +123,8 @@ export default class Transaction extends React.Component {
   };
 
   getShareType = async () => {
-    const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = "https://stockymanager.azurewebsites.net/api/ShareholderType";
+    const proxyurl = apiURL.proxyUrl;
+    let url = `${apiURL.baseUrl}/ShareholderType`;
     this.setState({ isOpen: true });
 
     await fetch(proxyurl + url)
@@ -167,8 +168,8 @@ export default class Transaction extends React.Component {
         shareholderTypeId: type,
         companyId: "CPN001",
       };
-      const proxyurl = "https://cors-anywhere.herokuapp.com/";
-      let url = "https://stockymanager.azurewebsites.net/api/Shareholder";
+      const proxyurl = apiURL.proxyUrl;
+      let url = `${apiURL.baseUrl}/Shareholder`;
       this.setState({ isOpen: true });
       toastr.options = {
         closeButton: false,
@@ -223,7 +224,11 @@ export default class Transaction extends React.Component {
     const value = event.target.value;
     this.setState({
       searchValue: value,
-      dataSearch: data && data.filter((item) => (item = value)),
+      dataSearch:
+        data &&
+        data.filter(function (item) {
+          return item.id.toLowerCase().includes(value.toLowerCase());
+        }),
     });
   };
 
@@ -425,7 +430,7 @@ export default class Transaction extends React.Component {
               </DialogContent>
               {Id === "" || totalShare === "" || UserId === "" ? (
                 <Grid container justify="center" style={{ color: "red" }}>
-                  Please input all in the form.
+                  Please input all the fields in the form.
                 </Grid>
               ) : null}
               <Grid container justify="center" style={{ color: "red" }}>
@@ -488,7 +493,7 @@ export default class Transaction extends React.Component {
                   </StyledTableCell>
                 </StyledTableRow>
               ))
-            ) : dataSearch && dataSearch ? (
+            ) : dataSearch && dataSearch.length > 0 ? (
               dataSearch.map((row, index) => (
                 <StyledTableRow key={index}>
                   <StyledTableCell component="th" scope="row">
